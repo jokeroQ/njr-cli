@@ -1,0 +1,24 @@
+{
+  "name": "njr-cli",
+  "version": "1.0.0",
+  "description": "cli工具",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "njr-cli": "./index.js"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^13.0.0",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^12.3.0",
+    "request": "^2.88.2",
+    "simple-git": "^3.27.0",
+    "tar": "^7.4.3"
+  }
+}
