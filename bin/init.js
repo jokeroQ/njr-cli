@@ -9,6 +9,8 @@ const prompt = inquirer.createPromptModule()
 const packageName = '@htf/templates'
 
 async function initProject(rootDir) {
+    //首先检查并更新模版包
+    checkAndCreateTemplatesDir()
     const newVersion = await checkLocalTemplateVersion()
     if (newVersion) {
         console.log(chalk.yellow(`下载并更新包${packageName}到最新版本`))

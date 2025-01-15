@@ -8,6 +8,7 @@ const { initProject } = require('./init')
 
 // 获取项目根目录
 const rootDir = path.resolve(__dirname, '..')
+const cliName = "@htf/ubooter"
 
 // 检查CLI工具版本
 async function checkToolVersion() {

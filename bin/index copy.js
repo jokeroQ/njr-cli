@@ -17,8 +17,8 @@ const cliName = "@htf/ubooter"
 const prompt = inquirer.createPromptModule()
 
 //定义本地npm包路径
-const templatesDir = path.resolve(__dirname, 'templates')
-const templatesPackagePath = path.resolve(templatesDir, 'package.json')
+const templatesDir = path.resolve(__dirname,'..', 'templates')
+const templatesPackagePath = path.resolve(templatesDir,'..', 'package.json')
 const npmResitry='http://172.26.200.183:9081/repository/npm-group/'
 
 //检查本地模版包是否为最新
@@ -39,7 +39,7 @@ async function checkLocalTemplateVersion() {
         //此处url包地址需要动态更换调整
         const url = `${npmResitry}${packageName}`
         return request(url).then((resp) => {
-            const data = JSON.parse(body)
+            const data = resp.data
             const latestVersion = data['dist-tags'].latest
             if (currentVersion !== latestVersion) {
                 console.log(chalk.yellow(`监测到最新版本${packageName}${latestVersion}`))
@@ -66,7 +66,7 @@ function checkAndCreateTemplatesDir() {
 async function packTemplate(packageName) {
     try {
         //创建临时目录
-        const tmpDir = path.join(__dirname, 'tmp_templates')
+        const tmpDir = path.join(__dirname, '..','tmp_templates')
         if (!fs.existsSync) {
             fs.mkdirSync(tmpDir)
         }
@@ -198,7 +198,7 @@ async function initProject() {
 //动态获取CLI工具的版本号
 function getToolVersion() {
     try {
-        const packageJsonPath = path.join(__dirname, 'package.json')
+        const packageJsonPath = path.join(__dirname,'..', 'package.json')
         const packageJson = fs.readFileSync(packageJsonPath, 'utf-8')
         const { version } = JSON.parse(packageJson)
         return version
@@ -214,7 +214,7 @@ async function getLatestToolVersion() {
     try {
         const url=`${npmResitry}${cliName}`
         return request(url).then((resp) => {
-            const data = JSON.parse(body)
+            const data = resp.data
             const latestVersion = data['dist-tags'].latest
             if (currentVersion !== latestVersion) {
                 console.log(chalk.yellow(`监测到最新版本${cliName}${latestVersion}`))

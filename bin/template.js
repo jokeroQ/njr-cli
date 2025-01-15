@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs-extra')
 const tar = require('tar')
 const chalk = require('chalk')
-const { execSync } = require('child_process')
+const { execSync, exec } = require('child_process')
 const request = require('axios')
 
 const npmResitry = 'http://172.26.200.183:9081/repository/npm-group/'
@@ -52,6 +52,7 @@ async function packTemplate(packageName) {
             fs.mkdirSync(tmpDir)
         }
         console.log(chalk.yellow(`从npm下载模版包 ${packageName} ...`))
+        execSync(`npm cache clean --force`,{stdio:'inherit'})
         execSync(`npm pack ${packageName} --registry=${npmResitry}`, { cwd: tmpDir, stdio: 'inherit' })
         const tgzFiles = fs.readdirSync(tmpDir).filter(file => file.startsWith('htf-templates-') && file.endsWith('.tgz'))
         if (tgzFiles.length === 0) {
