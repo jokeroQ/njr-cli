@@ -3,23 +3,29 @@ const inquirer = require('inquirer')
 const path = require('path')
 const fs = require('fs-extra')
 const chalk = require('chalk')
-const { checkLocalTemplateVersion, checkAndCreateTemplatesDir, packTemplate, extractTemplate, cleanUpTemplates, getTemplateFolders } = require('./template')
+const { checkTemplateVersion, checkAndCreateTemplatesDir, packTemplateAndgetPath, extractTemplate, cleanUpTemplates, getTemplateFolders } = require('./template')
 
 const prompt = inquirer.createPromptModule()
 const packageName = '@htf/templates'
 
-async function initProject(rootDir) {
-    //首先检查并更新模版包
+//首先检查并更新模版包
+const checkAndUpdateTemplate=async()=>{
+    //保证有存放模板的文件夹
     checkAndCreateTemplatesDir()
-    const newVersion = await checkLocalTemplateVersion()
+    const newVersion = await checkTemplateVersion()
     if (newVersion) {
         console.log(chalk.yellow(`下载并更新包${packageName}到最新版本`))
-        const tgzPath = await packTemplate('@htf/templates')
+        const tgzPath = await packTemplateAndgetPath('@htf/templates')
         await extractTemplate(tgzPath)
         cleanUpTemplates(tgzPath)
     } else {
         console.log(chalk.yellow('使用本地已有模版包'))
     }
+}
+
+const initProject=async(rootDir)=> {
+    //首先检查并更新模版包
+    await checkAndUpdateTemplate()
     const templateFolers = getTemplateFolders()
     if (templateFolers.length === 0) {
         console.log(chalk.red('无模板可用'))
