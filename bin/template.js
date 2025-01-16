@@ -4,7 +4,13 @@ const fs = require('fs-extra')
 const tar = require('tar')
 const chalk = require('chalk')
 const { execSync } = require('child_process')
-const {getOnlineVersion}=require('./utils')
+const { getOnlineVersion }=require('./utils')
+const { ora }=require('ora')
+
+const templateDescriptionMap={
+    "app-vue3":"vue3应用模板，内置guaa支持",
+    "main-vue":"基于wujie的vue3主应用模板"
+}
 
 const npmResitry = 'http://172.26.200.183:9081/repository/npm-group/'
 const packageName = '@htf/templates'
@@ -12,7 +18,7 @@ const templatesDir = path.resolve(__dirname, '..', 'templates')
 const templatesPackagePath = path.resolve(templatesDir, 'package.json')
 
 //比较本地与最新模版包版本是否一致，检查是否需要更新模板包
-const checkTemplateVersion=async()=> {
+const hasNewTemplateVersion=async()=> {
     try {
         const url = `${npmResitry}${packageName}`
         const latestVersion=await getOnlineVersion(url)
@@ -54,6 +60,7 @@ function checkAndCreateTemplatesDir() {
 
 //通过`npm pack`获取远程包并下载到临时文件夹
 const packTemplateAndgetPath=async(packageName)=> {
+    const spinner=ora(`从npm下载模版包 ${packageName} ...`).start()
     try {
         const tmpDir = path.join(__dirname, 'tmp_templates')
         if (!fs.existsSync(tmpDir)) {
@@ -68,14 +75,17 @@ const packTemplateAndgetPath=async(packageName)=> {
             return
         }
         const tgzPath = path.join(tmpDir, tgzFiles[0])
+        spinner.succeed('模版包下载完成')
         return tgzPath
     } catch (error) {
         console.error(chalk.red('更新模版包失败:', error))
+        spinner.fail('更新模版包失败')
     }
 }
 
 //解压tgz文件到本地templates目录
 const extractTemplate=async(tgzPath)=> {
+    const spinner=ora(`正在解压模版包.`).start()
     try {
         console.log(chalk.yellow('正在解压模版包...'))
         await tar.x({
@@ -84,8 +94,10 @@ const extractTemplate=async(tgzPath)=> {
             strip: 1
         })
         console.log(chalk.yellow('模版解压成功'))
+        spinner.succeed('模版解压成功')
     } catch (error) {
         console.error(chalk.red('模版解压失败'))
+        spinner.fail('模版解压失败')
     }
 }
 
@@ -103,14 +115,23 @@ const cleanUpTemplates=(tgzPath)=> {
 //读取模板文件夹下的模板
 const getTemplateFolders=()=> {
     const files = fs.readdirSync(templatesDir)
-    return files.filter(file => {
+    const templateWithDescriptions= files.filter(file => {
         const filePath = path.join(templatesDir, file)
         return fs.statSync(filePath).isDirectory() && file !== 'public'
+    }).map(templateName=>{
+        const description=templateDescriptionMap[templateName]||'no description avaliable'
+        return {
+            name:templateName,
+            value:templateName,
+            short:templateName,
+            description:description
+        }
     })
+    return templateWithDescriptions
 }
 
 module.exports = {
-    checkTemplateVersion,
+    hasNewTemplateVersion,
     checkAndCreateTemplatesDir,
     packTemplateAndgetPath,
     extractTemplate,

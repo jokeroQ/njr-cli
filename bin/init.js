@@ -3,7 +3,7 @@ const inquirer = require('inquirer')
 const path = require('path')
 const fs = require('fs-extra')
 const chalk = require('chalk')
-const { checkTemplateVersion, checkAndCreateTemplatesDir, packTemplateAndgetPath, extractTemplate, cleanUpTemplates, getTemplateFolders } = require('./template')
+const { hasNewTemplateVersion, checkAndCreateTemplatesDir, packTemplateAndgetPath, extractTemplate, cleanUpTemplates, getTemplateFolders } = require('./template')
 
 const prompt = inquirer.createPromptModule()
 const packageName = '@htf/templates'
@@ -12,7 +12,7 @@ const packageName = '@htf/templates'
 const checkAndUpdateTemplate=async()=>{
     //保证有存放模板的文件夹
     checkAndCreateTemplatesDir()
-    const newVersion = await checkTemplateVersion()
+    const newVersion = await hasNewTemplateVersion()
     if (newVersion) {
         console.log(chalk.yellow(`下载并更新包${packageName}到最新版本`))
         const tgzPath = await packTemplateAndgetPath('@htf/templates')
@@ -48,7 +48,11 @@ const initProject=async(rootDir)=> {
         type: 'list',
         name: 'template',
         message: 'Which template would you like to use?',
-        choices: templateFolers
+        choices: templateFolers.map(t=>({
+            name:`${t.name} - ${t.description}`,
+            value:t.value,
+            short:t.name
+        }))
     }])
 
     console.log(chalk.green(`You selected the "${template}" template.`))

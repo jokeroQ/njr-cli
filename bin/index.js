@@ -13,7 +13,7 @@ const rootDir = path.resolve(__dirname, '..')
 program.command('init')
     .description('Initialize a project with a selected template')
     .action(async () => {
-        if (await compareToolVersion()) return
+        await compareToolVersion()
         initProject(rootDir)  // 传入项目根目录路径
     })
 
