@@ -49,7 +49,7 @@ const initProject=async(rootDir)=> {
         name: 'template',
         message: 'Which template would you like to use?',
         choices: templateFolers.map(t=>({
-            name:`${t.name} - ${t.description}`,
+            name:`${t.name}${t.description?'- '+ t.description:''}`,
             value:t.value,
             short:t.name
         }))

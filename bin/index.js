@@ -5,6 +5,7 @@ const chalk = require('chalk')
 const path = require('path')
 const { compareToolVersion } = require('./version')
 const { initProject } = require('./init')
+const { startLoading,stopLoading }=require('./loading')
 
 // 获取项目根目录
 const rootDir = path.resolve(__dirname, '..')
@@ -13,8 +14,10 @@ const rootDir = path.resolve(__dirname, '..')
 program.command('init')
     .description('Initialize a project with a selected template')
     .action(async () => {
+        startLoading('初始化中')
         await compareToolVersion()
         initProject(rootDir)  // 传入项目根目录路径
+        stopLoading()
     })
 
 // 在命令行工具中加入帮助选项

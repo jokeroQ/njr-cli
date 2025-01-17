@@ -5,7 +5,7 @@ const tar = require('tar')
 const chalk = require('chalk')
 const { execSync } = require('child_process')
 const { getOnlineVersion }=require('./utils')
-const { ora }=require('ora')
+const { startLoading,stopLoading }=require('./loading')
 
 const templateDescriptionMap={
     "app-vue3":"vue3应用模板，内置guaa支持",
@@ -60,7 +60,7 @@ function checkAndCreateTemplatesDir() {
 
 //通过`npm pack`获取远程包并下载到临时文件夹
 const packTemplateAndgetPath=async(packageName)=> {
-    const spinner=ora(`从npm下载模版包 ${packageName} ...`).start()
+    startLoading(`从npm下载模版包 ${packageName} ...`)
     try {
         const tmpDir = path.join(__dirname, 'tmp_templates')
         if (!fs.existsSync(tmpDir)) {
@@ -75,17 +75,17 @@ const packTemplateAndgetPath=async(packageName)=> {
             return
         }
         const tgzPath = path.join(tmpDir, tgzFiles[0])
-        spinner.succeed('模版包下载完成')
+        stopLoading()
         return tgzPath
     } catch (error) {
+        stopLoading()
         console.error(chalk.red('更新模版包失败:', error))
-        spinner.fail('更新模版包失败')
     }
 }
 
 //解压tgz文件到本地templates目录
 const extractTemplate=async(tgzPath)=> {
-    const spinner=ora(`正在解压模版包.`).start()
+    startLoading(`正在解压模版包...`)
     try {
         console.log(chalk.yellow('正在解压模版包...'))
         await tar.x({
@@ -93,11 +93,11 @@ const extractTemplate=async(tgzPath)=> {
             C: templatesDir,
             strip: 1
         })
+        stopLoading()
         console.log(chalk.yellow('模版解压成功'))
-        spinner.succeed('模版解压成功')
     } catch (error) {
+        stopLoading()
         console.error(chalk.red('模版解压失败'))
-        spinner.fail('模版解压失败')
     }
 }
 
@@ -119,7 +119,7 @@ const getTemplateFolders=()=> {
         const filePath = path.join(templatesDir, file)
         return fs.statSync(filePath).isDirectory() && file !== 'public'
     }).map(templateName=>{
-        const description=templateDescriptionMap[templateName]||'no description avaliable'
+        const description=templateDescriptionMap[templateName]||''
         return {
             name:templateName,
             value:templateName,
